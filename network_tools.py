@@ -40,7 +40,7 @@ class Network:
             if self.my_os == "Windows":
                 traceroute = subprocess.Popen(f'tracert {ip}', shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
                 for line in iter(traceroute.stdout.readline, ""):
-                    line = line.split('  ')
+                    line = line.split(' ')
                     if len(line) != 0:
                         if line[0].isdigit():
                             if line[1].isnumeric() and line[3].isnumeric() and line[5].isnumeric():
