@@ -6,7 +6,7 @@ class Network:
     def __init__(self):
         self.my_os = platform.system() # Get what OS is using
 
-    def my_ping(self, ip, count):
+    def my_ping(self, ip, count=1):
         pattern = re.compile(r'((\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$)|((?:http.*://)?(?P<host>[^:/ ]+).?(?P<port>[0-9]*).*))') # Regex for valid hostname and IP address
         matches = pattern.match(ip)
         if matches: # Check if valid host name and IP address
@@ -18,11 +18,13 @@ class Network:
                     ping = subprocess.Popen(f'ping {ip} -n 1', shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True) # Issue ping command on CMD
                     stdout, stderr = ping.communicate()
                     stdout = stdout.split("\n")
-                    if _ == count: # Check if ping count is at max
+                    if _ == count and count != 1: # Check if ping count is at max and the count must greater than 1
                         time_ave = time_add // time_count
                         packet_loss_percent = packet_loss / count * 100
                         ave_output = {'pingcount': count, 'timeave': time_ave, 'packetloss': f'{packet_loss_percent}%'}
                         yield ave_output
+                        return # Stop Iteration
+                    elif _ == count: # If count is 1 dont return ave_output
                         return # Stop Iteration
                     for line in stdout:
                         if line.startswith("Reply from"): # Search String start "Reply from"
@@ -84,7 +86,7 @@ class Network:
 
 if __name__ == "__main__":
     my_network = Network()
-    for i in my_network.my_ping('212.83.168.230', 100):
+    for i in my_network.my_ping('212.83.168.230', 5):
         print(i)
     # for i in my_network.my_traceroute('facebook.com'):
     #     print(i)
