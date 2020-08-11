@@ -63,7 +63,7 @@ class Network:
                             time = 0 # Variable for adding all the time
                             count = 0 # Variable for counting time
                             for num in line:
-                                num.lstrip('<')
+                                num = num.lstrip('<')
                                 if num.isnumeric():
                                     time += int(num)
                                     count += 1
@@ -72,9 +72,7 @@ class Network:
                             except:
                                 time_ave = 0
                             if len(line) ==  5: # Check if there are hostname
-                                des_ip = line[4]
-                                des_ip.lstrip('[')
-                                des_ip.rstrip(']')
+                                des_ip = line[4].lstrip('[').rstrip(']') # Strip the bracket from ip
                                 host_name = line[3]
                             else:
                                 des_ip = line[3]
@@ -86,9 +84,11 @@ class Network:
 
 if __name__ == "__main__":
     my_network = Network()
-    for i in my_network.my_ping('212.83.168.230', 5):
-        print(i)
+    # for i in my_network.my_ping('8.8.8.8'):
+    #     print(i)
     # for i in my_network.my_traceroute('facebook.com'):
     #     print(i)
-    # for i in my_network.my_traceroute('8.8.8.8'):
-    #     print(i)
+    for i in my_network.my_traceroute('1.1.1.1'):
+        print(i)
+    # traceroute = my_network.my_traceroute('facebook.com')
+    # print(next(traceroute))

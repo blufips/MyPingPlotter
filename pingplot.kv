@@ -12,11 +12,13 @@
         text: 'Start'
         size_hint: 0.15, 0.1
         pos_hint: {'x':0.6, 'top':0.95}
+        on_release: root.click_start()
     Button:
         id: stop_button
         text: 'Stop'
         size_hint: 0.15, 0.1
         pos_hint: {'x':0.8, 'top':0.95}
+        on_release: root.click_stop()
     GridLayout:
         cols: 1
         size_hint: 0.5, 0.75
@@ -70,15 +72,13 @@
         plot: MeshLinePlot
         xlabel:'Latency'
         ylabel:'Hop'
-        x_ticks_minor:5
-        x_tics_major:25
+        x_ticks_minor:1
+        x_tics_major:50
         y_ticks_major:1
         y_grid_label:True
         x_grid_label:True
         padding:5
         x_grid:True
         y_grid:True
-        xmin:-0
-        # xmax:100
-        ymin:-10
-        # ymax:0
+        xmin:0
+        ymax:0
