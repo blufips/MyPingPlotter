@@ -54,6 +54,7 @@ class SetGraph(FloatLayout):
         except StopIteration:
             with concurrent.futures.ThreadPoolExecutor() as executor: # Create concurrent threading to all the ping command
                 results = executor.map(my_network.my_ping, self.ip_list)
+                results = list(results) # Force the results evaluation
             self.time_list = [0]
             for result in results: # loop to get the generated output of ping
                 for ping in result:
