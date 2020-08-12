@@ -4,11 +4,14 @@ from kivy.clock import Clock, mainthread
 from kivy_garden.graph import Graph, MeshLinePlot
 import threading
 import concurrent.futures
+import time
 import network_tools
 
 my_network = network_tools.Network() # Create Object for network tools like ping ang tracert
 
 class SetGraph(FloatLayout):
+    stop = threading.Event() # Event property to stop all the threading
+
     def __init__(self, **kwargs):
         super(SetGraph, self).__init__(**kwargs)
         self.on_going = None # Variable for checking if the tracert is ongoing
@@ -25,7 +28,7 @@ class SetGraph(FloatLayout):
             self.ip_list = []
             self.plot = None # Variable for checking if plot is added to graph
             self.traceroute = my_network.my_traceroute(self.ids.host_input.text) # Issue Tracert in external command line and return generator
-            self.event1 = Clock.create_trigger(self.update_graph, 1) # Create a trigger event of method update_graph to make a repeated check of graph
+            self.event1 = Clock.create_trigger(self.update_graph, 0.2) # Create a trigger event of method update_graph to make a repeated check of graph
             self.stop_thread = False # Variable for checking the signal to stop the threading
             self.on_start()
 
@@ -43,6 +46,7 @@ class SetGraph(FloatLayout):
         Threading is used to avoid the GUI to freeze and to speed up I/O
         After checking the current value of tracert or ping it update the graph
         """
+        self.t1 = time.time()
         try: # Try to Iterate to self.traceroute generator if raise exeception issue ping command to all IP in the self.ip_list
             if self.stop_thread: # Check if the thread is need to stop
                 return
@@ -52,9 +56,9 @@ class SetGraph(FloatLayout):
             self.time_list.append(int(current_trace['time']))
             self.ip_list.append(current_trace['desip'])
         except StopIteration:
-            with concurrent.futures.ThreadPoolExecutor() as executor: # Create concurrent threading to all the ping command
+            with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor: # Create concurrent threading to all the ping command
                 results = executor.map(my_network.my_ping, self.ip_list)
-                results = list(results) # Force the results evaluation
+                # results = list(results) # Force the results evaluation
             self.time_list = [0]
             for result in results: # loop to get the generated output of ping
                 for ping in result:
@@ -76,10 +80,16 @@ class SetGraph(FloatLayout):
         self.ids.tracert_graph.ymin = -1 * (len(self.hop_list) - 1) # Set the ymin use max hop
         self.ids.tracert_graph.xmax = max(self.time_list)+10 # Set the xmas use the max value in time_list
         self.ids['tracert_graph'].add_plot(self.plot)
+        self.t2 = time.time()
+        print(self.t2 - self.t1)
         self.on_start() # Update the value of plot points from network_thread
 
-
     def click_stop(self):
+        if self.on_going == True:
+            self.on_going = None
+            threading.Thread(target=self.on_stop).start()
+
+    def on_stop(self):
         """
         This method is to stop the tracert function
         It stop the threading and cancel the loop event for updating the graph
@@ -93,16 +103,14 @@ class SetGraph(FloatLayout):
             self.ids['tracert_graph'].remove_plot(self.plot)
             self.ids['tracert_graph']._clear_buffer()
 
-
 class PingPlotApp(App):
-    stop = threading.Event() # Event property to stop all the threading
 
     def build(self):
         my_graph = SetGraph()
         return my_graph
 
     def on_stop(self):
-        self.stop.set() # Set a stop signal for secondary threads
+        self.root.stop.set() # Set a stop signal for secondary threads
 
 if __name__ == '__main__':
     PingPlotApp().run()

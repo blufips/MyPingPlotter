@@ -7,6 +7,15 @@ class Network:
         self.my_os = platform.system() # Get what OS is using
 
     def my_ping(self, ip, count=1):
+        """Method for ping, It accept 2 argument hostname or IP address and ping count with default value of 1"""
+        if ip == 'Request': # This is for the main.py when it receive this IP it will return 0 Time and RTO
+            des_ip = ip
+            send_bytes = None
+            time = '0'
+            ttl = None
+            rto = True
+            ping_output = {'desip':des_ip, 'byte':send_bytes, 'time':time, 'ttl':ttl, 'rto':rto}
+            yield ping_output
         pattern = re.compile(r'((\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$)|((?:http.*://)?(?P<host>[^:/ ]+).?(?P<port>[0-9]*).*))') # Regex for valid hostname and IP address
         matches = pattern.match(ip)
         if matches: # Check if valid host name and IP address
@@ -84,11 +93,11 @@ class Network:
 
 if __name__ == "__main__":
     my_network = Network()
-    # for i in my_network.my_ping('8.8.8.8'):
-    #     print(i)
+    for i in my_network.my_ping('Request'):
+        print(i)
     # for i in my_network.my_traceroute('facebook.com'):
     #     print(i)
-    for i in my_network.my_traceroute('1.1.1.1'):
-        print(i)
+    # for i in my_network.my_traceroute('1.1.1.1'):
+    #     print(i)
     # traceroute = my_network.my_traceroute('facebook.com')
     # print(next(traceroute))
