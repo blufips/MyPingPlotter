@@ -21,14 +21,14 @@ class SetGraph(FloatLayout):
         This method is to start the graph plot upon click start button
         It initialize the attributes for the graph plot
         """
-        if not self.on_going: # Check if the tracert is ongoing
+        if not self.on_going: # Check if the tracert is ongoing. To prevent multiple thread on start
             self.on_going = True
             self.hop_list = [0]
             self.time_list = [0]
             self.ip_list = []
             self.plot = None # Variable for checking if plot is added to graph
             self.traceroute = my_network.my_traceroute(self.ids.host_input.text) # Issue Tracert in external command line and return generator
-            self.event1 = Clock.create_trigger(self.update_graph, 0.2) # Create a trigger event of method update_graph to make a repeated check of graph
+            self.event1 = Clock.create_trigger(self.update_graph, 0.1) # Create a trigger event of method update_graph to make a repeated check of graph
             self.stop_thread = False # Variable for checking the signal to stop the threading
             self.on_start()
 
@@ -85,7 +85,10 @@ class SetGraph(FloatLayout):
         self.on_start() # Update the value of plot points from network_thread
 
     def click_stop(self):
-        if self.on_going == True:
+        """
+        This method is to check if the tracert is ongoing and start on_stop thread
+        """
+        if self.on_going == True: # Check if the tracert is on going. To prevent multiple thread on stop
             self.on_going = None
             threading.Thread(target=self.on_stop).start()
 
