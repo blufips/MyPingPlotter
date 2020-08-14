@@ -56,7 +56,7 @@ class SetGraph(FloatLayout):
             self.time_list.append(int(current_trace['time']))
             self.ip_list.append(current_trace['desip'])
         except StopIteration:
-            with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor: # Create concurrent threading to all the ping command
+            with concurrent.futures.ThreadPoolExecutor() as executor: # Create concurrent threading to all the ping command
                 results = executor.map(my_network.my_ping, self.ip_list)
                 # results = list(results) # Force the results evaluation
             self.time_list = [0]
@@ -77,7 +77,7 @@ class SetGraph(FloatLayout):
             self.ids['tracert_graph']._clear_buffer() # Clear the buffer
         self.plot = MeshLinePlot(color=[1, 0, 0, 1])
         self.plot.points = [(self.time_list[num], self.hop_list[num]) for num in range(len(self.hop_list))] # Set the value of plot points
-        self.ids.tracert_graph.ymin = -1 * (len(self.hop_list) - 1) # Set the ymin use max hop
+        self.ids.tracert_graph.ymin = -1 * (len(self.hop_list)-1) # Set the ymin use max hop
         self.ids.tracert_graph.xmax = max(self.time_list)+10 # Set the xmas use the max value in time_list
         self.ids['tracert_graph'].add_plot(self.plot)
         self.t2 = time.time()

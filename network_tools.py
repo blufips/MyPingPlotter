@@ -16,6 +16,7 @@ class Network:
             rto = True
             ping_output = {'desip':des_ip, 'byte':send_bytes, 'time':time, 'ttl':ttl, 'rto':rto}
             yield ping_output
+            return # Stop Iteration
         pattern = re.compile(r'((\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$)|((?:http.*://)?(?P<host>[^:/ ]+).?(?P<port>[0-9]*).*))') # Regex for valid hostname and IP address
         matches = pattern.match(ip)
         if matches: # Check if valid host name and IP address
@@ -97,7 +98,7 @@ if __name__ == "__main__":
         print(i)
     # for i in my_network.my_traceroute('facebook.com'):
     #     print(i)
-    # for i in my_network.my_traceroute('1.1.1.1'):
+    # for i in my_network.my_traceroute('8.8.8.8'):
     #     print(i)
     # traceroute = my_network.my_traceroute('facebook.com')
     # print(next(traceroute))
