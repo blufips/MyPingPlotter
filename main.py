@@ -1,10 +1,14 @@
 from kivy.app import App
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.label import Label
+from kivy.uix.button import Button
 from kivy.clock import Clock, mainthread
 from kivy_garden.graph import Graph, MeshLinePlot
+
 import threading
 import concurrent.futures
+from functools import partial
+import subprocess
 import time
 import network_tools
 
@@ -57,6 +61,8 @@ class SetGraph(FloatLayout):
                 packet_loss = 0
             if current_trace['hostname'] == None:
                 current_trace['hostname'] = ' '
+            elif len(current_trace['hostname']) > 10:
+                current_trace['hostname'] = current_trace['hostname'][:10]+'...'
             self.hop_dict[-1*int(current_trace['hop'])] = {'time': int(current_trace['time']),
                                                            'desip': current_trace['desip'],
                                                            'hostname': current_trace['hostname'],
@@ -103,19 +109,27 @@ class SetGraph(FloatLayout):
             hop_label = Label(text=str(num*-1), size_hint_x=0.1)
             pl = round(self.hop_dict[num]['packetloss']/self.hop_dict[num]['count']*100, 2)
             pl_label = Label(text=str(pl), size_hint_x=0.1)
-            ip_label = Label(text=self.hop_dict[num]['desip'], size_hint_x=0.3)
+            ip_button = Button(text=self.hop_dict[num]['desip'], size_hint_x=0.3, on_release=partial(self.on_press, self.hop_dict[num]['hostname'], self.hop_dict[num]['desip'], str(num*-1)))
             name_label = Label(text=self.hop_dict[num]['hostname'], size_hint_x=0.3, text_size=(self.ids.output_grid.width*0.3, None), halign='center')
             avg_label = Label(text=str(self.hop_dict[num]['avg']), size_hint_x=0.1)
             cur_label = Label(text=str(self.hop_dict[num]['time']), size_hint_x=0.1)
             self.ids.output_grid.add_widget(hop_label)
             self.ids.output_grid.add_widget(pl_label)
-            self.ids.output_grid.add_widget(ip_label)
+            self.ids.output_grid.add_widget(ip_button)
             self.ids.output_grid.add_widget(name_label)
             self.ids.output_grid.add_widget(avg_label)
             self.ids.output_grid.add_widget(cur_label)
         self.t2 = time.time()
         print(self.t2 - self.t1)
         self.on_start() # Update the value of plot points from network_thread
+
+    def on_press(self, hostname, desip, hop, *args):
+        """
+        This method is to open python file ping_new_window.py with argument of hostname, desip and hop 
+        when the button press on ip_button
+        """
+        my_args = [hostname, desip, hop]
+        subprocess.Popen(['python', 'ping_new_window.py'] + my_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     def click_stop(self):
         """

@@ -94,8 +94,9 @@ class Network:
 
 if __name__ == "__main__":
     my_network = Network()
-    for i in my_network.my_ping('Request'):
-        print(i)
+    # for i in my_network.my_ping('Request'):
+    #     print(i)
+    print(next(my_network.my_ping('8.8.8.8')))
     # for i in my_network.my_traceroute('facebook.com'):
     #     print(i)
     # for i in my_network.my_traceroute('8.8.8.8'):
