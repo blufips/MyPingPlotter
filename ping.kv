@@ -2,20 +2,22 @@
 <Screen>:
     Label:
         id: hostname_label
-        size_hint: 0.12, 0.1
+        size_hint: 0.15, 0.1
         pos_hint: {'x':0.05, 'top':0.95}
+        text_size: self.width, None
+        halign: 'center'
     Label:
         id: desip_label
         size_hint: 0.12, 0.1
-        pos_hint: {'x':0.17, 'top':0.95}
+        pos_hint: {'x':0.22, 'top':0.95}
     Label:
         id: hop_label
         size_hint: 0.1, 0.1
-        pos_hint: {'x':0.29, 'top':0.95}
+        pos_hint: {'x':0.34, 'top':0.95}
     Label:
         id: ping_label
         size_hint: 0.1, 0.1
-        pos_hint: {'x':0.39, 'top':0.95}
+        pos_hint: {'x':0.44, 'top':0.95}
     Label:
         text: 'Graph time = '
         size_hint: 0.125, 0.1

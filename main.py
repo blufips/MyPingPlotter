@@ -61,8 +61,8 @@ class SetGraph(FloatLayout):
                 packet_loss = 0
             if current_trace['hostname'] == None:
                 current_trace['hostname'] = ' '
-            elif len(current_trace['hostname']) > 10:
-                current_trace['hostname'] = current_trace['hostname'][:10]+'...'
+            # elif len(current_trace['hostname']) > 10:
+            #     current_trace['hostname'] = current_trace['hostname'][:10]+'...'
             self.hop_dict[-1*int(current_trace['hop'])] = {'time': int(current_trace['time']),
                                                            'desip': current_trace['desip'],
                                                            'hostname': current_trace['hostname'],
@@ -113,7 +113,11 @@ class SetGraph(FloatLayout):
             if self.hop_dict[num]['desip'] == 'Request': # Change text Request into RTO
                 self.hop_dict[num]['desip'] = 'RTO'
             ip_button = Button(text=self.hop_dict[num]['desip'], size_hint_x=0.3, on_release=partial(self.on_press, self.hop_dict[num]['hostname'], self.hop_dict[num]['desip'], str(num*-1)))
-            name_label = Label(text=self.hop_dict[num]['hostname'], size_hint_x=0.3, text_size=(self.ids.output_grid.width*0.3, None), halign='center')
+            if len(self.hop_dict[num]['hostname']) > 10: # Cut the letter of host name if the len is morethan 10
+                hop_dict = self.hop_dict[num]['hostname'][:10]+'...'
+            else:
+                hop_dict = self.hop_dict[num]['hostname']
+            name_label = Label(text=hop_dict, size_hint_x=0.3, text_size=(self.ids.output_grid.width*0.3, None), halign='center')
             avg_label = Label(text=str(self.hop_dict[num]['avg']), size_hint_x=0.1)
             cur_label = Label(text=str(self.hop_dict[num]['time']), size_hint_x=0.1)
             self.ids.output_grid.add_widget(hop_label)

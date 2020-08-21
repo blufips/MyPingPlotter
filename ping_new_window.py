@@ -86,8 +86,8 @@ class Screen(FloatLayout):
         time_elapse = self.time_diff - datetime.timedelta(microseconds=self.time_diff.microseconds) # Remove the microseconds
         self.ids.tracert_graph.xlabel = "time elapse : " + str(time_elapse) # Display Run time
         self.ids['tracert_graph'].add_plot(self.plot)
-        if self.check_minute_input != self.ids.tracert_graph.xmax:
-            self.check_minute_input = self.ids.tracert_graph.xmax
+        if self.check_minute_input != self.ids.tracert_graph.xmax: # Check if minutes_text is changes
+            self.check_minute_input = self.ids.tracert_graph.xmax # If minutes_text is change. Changed the check_minute_input
             self.update_time_label()
         elif int(self.time_diff.seconds) >= self.ids.tracert_graph.xmax: # Check if the X-axis(time) is equal or morethan to X-max
             self.update_time_label()
@@ -95,13 +95,17 @@ class Screen(FloatLayout):
             Clock.schedule_once(self.on_start, 1)
 
 class FloatInput(TextInput):
-    pat = re.compile('[^0-9]')
+    """
+    This method is to filter the minutes_text Input
+    It allow Digit 3 Digits from 0-9
+    """
+    pat = re.compile('[^0-9]') # Do not include 0-9
     def insert_text(self, substring, from_undo=False):
         pat = self.pat
-        if len(self.text) > 2:
+        if len(self.text) > 2: # Check if the len of minutes_text is greated than 2
             s = ''
         else:
-            s = ''.join([re.sub(pat, '', s) for s in substring])
+            s = ''.join([re.sub(pat, '', s) for s in substring]) # Check each substring if not 0-9 replace it with ''
         return super(FloatInput, self).insert_text(s, from_undo=from_undo)
 
 class PingApp(App):
