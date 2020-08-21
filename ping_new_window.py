@@ -36,6 +36,9 @@ class Screen(FloatLayout):
         This method is to update the time label
         There are total 7 time label
         """
+        if self.plot: # Check if the self.plot exists
+            for plot in range(len(self.ids.tracert_graph.plots)): # Loop to all the added plot
+                self.ids['tracert_graph'].remove_plot(self.ids.tracert_graph.plots[0]) # Remove the fist element in the plots
         self.current_time = datetime.datetime.now() # Get the current time
         self.time_string = self.current_time.strftime("%H:%M:%S") # Format the current time
         self.ids.time1_label.text = self.time_string
@@ -75,9 +78,6 @@ class Screen(FloatLayout):
         """
         This method is to update the graph
         """
-        if self.plot: # Check if the self.plot exists
-            self.ids['tracert_graph'].remove_plot(self.plot) # Remove the plot
-            self.ids['tracert_graph']._clear_buffer() # Clear buffer
         self.plot = MeshLinePlot(color=[1, 0, 0, 1])
         self.plot.points = [(self.time_table_list[num], self.latency_list[num]) for num in range(len(self.latency_list))]
         self.ids.tracert_graph.ymax = max(self.latency_list) # Get the highest latency and set it to ymax
