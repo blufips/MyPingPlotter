@@ -1,10 +1,12 @@
 from kivy.app import App
 from kivy_garden.graph import Graph, MeshLinePlot
 from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.textinput import TextInput
 from kivy.clock import Clock, mainthread
 import sys
 import datetime
 import threading
+import re
 import network_tools
 
 my_network = network_tools.Network()
@@ -24,13 +26,12 @@ class Screen(FloatLayout):
         This method initialize the value of labels of hostname, desip and hop
         It calls the method update_time_label and on_start
         """
+        self.check_minute_input = self.ids.tracert_graph.xmax # Variable for comparing the minutes_text
         self.ids.hostname_label.text = self.hostname
         self.ids.desip_label.text = self.desip
         self.ids.hop_label.text = 'HOP ' + self.hop
         self.update_time_label() # Update the all time label
-        self.on_start() # Start
 
-    @mainthread
     def update_time_label(self):
         """
         This method is to update the time label
@@ -46,10 +47,11 @@ class Screen(FloatLayout):
         self.latency_list = list()
         self.time_table_list = list()
         for num in range(1, len(self.time_label_list)+1):
-            minutes = 10 * num
+            minutes = int(self.ids.tracert_graph.xmax) / 360 * num
             future_time = self.current_time + datetime.timedelta(minutes = minutes)
             future_string = future_time.strftime("%H:%M:%S")
             self.time_label_list[num-1].text = future_string
+        self.on_start() # Start
 
     def on_start(self, *args):
         """
@@ -84,12 +86,23 @@ class Screen(FloatLayout):
         time_elapse = self.time_diff - datetime.timedelta(microseconds=self.time_diff.microseconds) # Remove the microseconds
         self.ids.tracert_graph.xlabel = "time elapse : " + str(time_elapse) # Display Run time
         self.ids['tracert_graph'].add_plot(self.plot)
-        if int(self.time_diff.seconds) >= self.ids.tracert_graph.xmax: # Check if the X-axis(time) is equal or morethan to X-max
+        if self.check_minute_input != self.ids.tracert_graph.xmax:
+            self.check_minute_input = self.ids.tracert_graph.xmax
             self.update_time_label()
-            Clock.schedule_once(self.on_start, 0)
+        elif int(self.time_diff.seconds) >= self.ids.tracert_graph.xmax: # Check if the X-axis(time) is equal or morethan to X-max
+            self.update_time_label()
         else:
             Clock.schedule_once(self.on_start, 1)
 
+class FloatInput(TextInput):
+    pat = re.compile('[^0-9]')
+    def insert_text(self, substring, from_undo=False):
+        pat = self.pat
+        if len(self.text) > 2:
+            s = ''
+        else:
+            s = ''.join([re.sub(pat, '', s) for s in substring])
+        return super(FloatInput, self).insert_text(s, from_undo=from_undo)
 
 class PingApp(App):
     def build(self):

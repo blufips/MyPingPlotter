@@ -8,7 +8,7 @@ class Network:
 
     def my_ping(self, ip, count=1):
         """Method for ping, It accept 2 argument hostname or IP address and ping count with default value of 1"""
-        if ip == 'Request': # This is for the main.py when it receive this IP it will return 0 Time and RTO
+        if ip == 'Request' or ip == 'RTO': # This is for the main.py when it receive this IP it will return 0 Time and RTO
             des_ip = ip
             send_bytes = None
             time = '0'
@@ -41,11 +41,15 @@ class Network:
                             line_output = line.split()
                             des_ip = line_output[2][:-1]
                             send_bytes = line_output[3][6:]
-                            time = line_output[4][5:].strip('ms')
+                            if line_output[4][:4] == 'time': # Check if the respond time
+                                time = line_output[4][5:].strip('ms')
+                                rto = False
+                            else:
+                                time = '0'
+                                rto = True
                             time_add += int(time)
                             time_count += 1
                             ttl = line_output[5][4:]
-                            rto = False
                             ping_output = {'desip':des_ip, 'byte':send_bytes, 'time':time, 'ttl':ttl, 'rto':rto}
                     for line in stdout:
                         if line.startswith("Request timed out"): # Search String start "Request timed out"

@@ -49,7 +49,7 @@ class SetGraph(FloatLayout):
         Threading is used to avoid the GUI to freeze and to speed up I/O
         After checking the current value of tracert or ping it update the graph
         """
-        self.t1 = time.time()
+        # self.t1 = time.time()
         try: # Try to Iterate to self.traceroute generator if raise exeception issue ping command to all IP in the self.ip_list
             if self.stop_thread: # Check if the thread is need to stop
                 return
@@ -77,6 +77,7 @@ class SetGraph(FloatLayout):
             hop_count = -1 # hop counting
             for result in results: # loop to get the generated output of ping
                 for ping in result:
+                    # print(ping)
                     self.hop_dict[hop_count]['time'] = int(ping['time']) # Set the new self.time_list value
                     self.hop_dict[hop_count]['count'] += 1
                     if ping['rto']:
@@ -109,6 +110,8 @@ class SetGraph(FloatLayout):
             hop_label = Label(text=str(num*-1), size_hint_x=0.1)
             pl = round(self.hop_dict[num]['packetloss']/self.hop_dict[num]['count']*100, 2)
             pl_label = Label(text=str(pl), size_hint_x=0.1)
+            if self.hop_dict[num]['desip'] == 'Request': # Change text Request into RTO
+                self.hop_dict[num]['desip'] = 'RTO'
             ip_button = Button(text=self.hop_dict[num]['desip'], size_hint_x=0.3, on_release=partial(self.on_press, self.hop_dict[num]['hostname'], self.hop_dict[num]['desip'], str(num*-1)))
             name_label = Label(text=self.hop_dict[num]['hostname'], size_hint_x=0.3, text_size=(self.ids.output_grid.width*0.3, None), halign='center')
             avg_label = Label(text=str(self.hop_dict[num]['avg']), size_hint_x=0.1)
@@ -119,13 +122,13 @@ class SetGraph(FloatLayout):
             self.ids.output_grid.add_widget(name_label)
             self.ids.output_grid.add_widget(avg_label)
             self.ids.output_grid.add_widget(cur_label)
-        self.t2 = time.time()
-        print(self.t2 - self.t1)
+        # self.t2 = time.time()
+        # print(self.t2 - self.t1)
         self.on_start() # Update the value of plot points from network_thread
 
     def on_press(self, hostname, desip, hop, *args):
         """
-        This method is to open python file ping_new_window.py with argument of hostname, desip and hop 
+        This method is to open python file ping_new_window.py with argument of hostname, desip and hop
         when the button press on ip_button
         """
         my_args = [hostname, desip, hop]
